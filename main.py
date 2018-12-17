@@ -1,11 +1,12 @@
 import re
 import cv2
+import convert
 from random import *
 from urllib.request import urlopen
 from bs4 import BeautifulSoup
-# import libraries
+# Please import libraries
 # 1. opencv-python
-# 2. beautifulSoup
+# 2. beautifulSoup4
 
 # 게임 소개 클래스
 class BaseInfo:
@@ -56,7 +57,7 @@ class StartGame:
             return str(c.group())
 
     # 1. 식당 방문 타이틀 세팅
-    def crawltofranchise(self):  
+    def crawltofranchise(self):
         html = urlopen("https://www.businessinsider.com/top-food-franchises-in-america-2016-1#15-baskin-robbins-2")
         bsobj = BeautifulSoup(html.read(), "html.parser")
         section = bsobj.find("div", {"class": "slide-title clearfix"})  # 타이틀을 포함하고 있는 h2 태그 찾아옴
@@ -64,7 +65,7 @@ class StartGame:
 
         for title in bsobj.find_all("h2", {"class": "slide-title-text"}):
             title = title.text.strip()
-            title = self.converttotitle(title)
+            title = convert.converttotitle(title)
             # print(title)
             tilen = len(title)
             if 6 < tilen < 20:  # 기회는 6번이기 때문에 길이 6자 이상만 가져옴 and 너무 길면 어려우니 20자
@@ -85,7 +86,7 @@ class StartGame:
         for title in section.find_all("a", {"class": "unstyled articleLink"}):  # 타이틀이 명시되어 있는 a 태그만 찾아옴
             title = title.text.strip()
             if (title != "View All"):  # 필요없는 태그 예외
-                title = self.converttotitle(title)
+                title = convert.converttotitle(title)
                 tilen = len(title)
                 if 6 < tilen < 20:  # 기회는 6번이기 때문에 길이 6자 이상만 가져옴 and 너무 길면 어려우니 20자
                     self.tiList.append(title)
@@ -127,7 +128,7 @@ class PlayGame:
 
     #  답지에 알파벳작성
     def updatecuslist(self, alpha):
-        print("남은 LIFE ", "★"*(self.life-1))
+        print("남은 LIFE :", "★"*(self.life-1))
         alpha = alpha.lower()
         x = 0
         idx = 0
@@ -156,7 +157,7 @@ class PlayGame:
             img = cv2.imread(self.hanggirl,0)
             cv2.namedWindow(self.hanggirl, cv2.WINDOW_NORMAL)
             cv2.imshow(self.hanggirl,img)
-            cv2.waitKey(2000)
+            cv2.waitKey(1500)
             cv2.destroyAllWindows()
 
 
@@ -195,6 +196,9 @@ elif an.subnum == '3':
     print("좋은 꿈 꾸세요^~^")
     print(an.line)
     quit()
+else:
+    print("주제를 잘못 선택하셨습니다. 0~3 범위의 숫자를 입력하세요.")
+    quit()
 
 #  게임 진행
 pl.setanswer(st.answer)  
@@ -209,5 +213,6 @@ while pl.ansList != pl.cusList and pl.life > 0:
 #  게임 결과
 if pl.life == 0:
     print("게임에서 졌습니다.")
+    print("정답은", st.answer,"입니다.")
 else:
     print("게임에서 이겼습니다.")
